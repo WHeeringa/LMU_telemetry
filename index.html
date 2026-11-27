@@ -9,11 +9,13 @@
 <style>
 /* Layout: a pit-wall workbench. Lap picker on top, map + coaching side by side, stacked distance traces below. */
 :root{
-  --bg:#eef0f3; --panel:#ffffff; --panel-2:#f6f7f9; --line:#d9dde4; --fg:#161a21; --muted:#5d6675; --faint:#8b93a1;
-  --you:#e8590c; --ref:#1c6fd6; --thr:#1f9d55; --brk:#d0393e;
-  --ev-lock:#c98a00; --ev-spin:#b5267a; --ev-over:#6d3fd6; --ev-under:#0b8ea8; --ev-off:#8a5a2b; --ev-abs:#9aa3b1;
-  --gain:#1f9d55; --loss:#d0393e; --grid:#e7eaef; --chip:#eef1f5; --focus:#1c6fd6; --best:#7b3fe4;
-  --sky1:#b9d3ee; --sky2:#e9f1f9; --grass:#8fb178; --grass2:#a9c592; --asphalt:#6b7079; --asphalt2:#7d828b; --kerb:#f4f4f4;
+  /* light look, Wesley's palette: #D6DAC8 sage (page), #FBF3D5 cream (cards), #9CAFAA teal (selected, sky), #D6A99D rose (chips, hover) */
+  --bg:#d6dac8; --panel:#fbf3d5; --panel-2:#f3e9c8; --line:#c4c9b4; --fg:#1f2523; --muted:#545e5a; --faint:#838d88;
+  --you:#e0560c; --ref:#1c6ad0; --thr:#1f9550; --brk:#cc373c;
+  --ev-lock:#b98000; --ev-spin:#b5267a; --ev-over:#6d3fd6; --ev-under:#0b8ea8; --ev-off:#8a5a2b; --ev-abs:#98a29d;
+  --gain:#1f9550; --loss:#cc373c; --grid:#e6dfc0; --chip:#efdac6; --focus:#4f746d; --best:#7b3fe4;
+  --sel:#9cafaa; --sel-fg:#1f2523; --hover:#f0dccd; --accent:#d6a99d; --accent-fg:#1f2523;
+  --sky1:#9cafaa; --sky2:#ece8d0; --grass:#a3b393; --grass2:#b6c2a5; --asphalt:#6e6b68; --asphalt2:#807c78; --kerb:#fbf3d5;
   --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
   --f-body:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
@@ -23,12 +25,14 @@
   --you:#ff7a33; --ref:#4ea1ff; --thr:#3fc07a; --brk:#ff5c61;
   --ev-lock:#f2b631; --ev-spin:#ec5fb0; --ev-over:#a27cff; --ev-under:#35c4dd; --ev-off:#c28a55; --ev-abs:#6f7a89;
   --gain:#3fc07a; --loss:#ff5c61; --grid:#212831; --chip:#222a34; --focus:#4ea1ff; --best:#b18cff;
+  --sel:#e9edf2; --sel-fg:#0a0d11; --hover:color-mix(in srgb,#e9edf2 6%,#11161c); --accent:#ff7a33; --accent-fg:#fff;
   --sky1:#0d1a2b; --sky2:#28405c; --grass:#2c4426; --grass2:#36522e; --asphalt:#3b4048; --asphalt2:#474d56; --kerb:#c9ced6; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0a0d11; --panel:#11161c; --panel-2:#161c24; --line:#242c37; --fg:#e9edf2; --muted:#98a2b0; --faint:#69737f;
   --you:#ff7a33; --ref:#4ea1ff; --thr:#3fc07a; --brk:#ff5c61;
   --ev-lock:#f2b631; --ev-spin:#ec5fb0; --ev-over:#a27cff; --ev-under:#35c4dd; --ev-off:#c28a55; --ev-abs:#6f7a89;
   --gain:#3fc07a; --loss:#ff5c61; --grid:#212831; --chip:#222a34; --focus:#4ea1ff; --best:#b18cff;
+  --sel:#e9edf2; --sel-fg:#0a0d11; --hover:color-mix(in srgb,#e9edf2 6%,#11161c); --accent:#ff7a33; --accent-fg:#fff;
   --sky1:#0d1a2b; --sky2:#28405c; --grass:#2c4426; --grass2:#36522e; --asphalt:#3b4048; --asphalt2:#474d56; --kerb:#c9ced6; color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -49,10 +53,10 @@ select{font:inherit;border:1px solid var(--line);background:var(--panel);color:v
 
 /* ---- polish ---- */
 button,.btn,select{transition:background-color .15s,border-color .15s,color .15s}
-button:hover:not(:disabled),.btn:hover{border-color:var(--faint);background:color-mix(in srgb,var(--fg) 6%,var(--panel))}
+button:hover:not(:disabled),.btn:hover{border-color:var(--faint);background:var(--hover)}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-.btn.accent{background:var(--you);border-color:var(--you);color:#fff;font-weight:600}
-.btn.accent:hover{background:color-mix(in srgb,var(--you) 85%,#000);border-color:var(--you)}
+.btn.accent{background:var(--accent);border-color:var(--accent);color:var(--accent-fg);font-weight:600}
+.btn.accent:hover{background:color-mix(in srgb,var(--accent) 85%,#000);border-color:var(--accent)}
 button.icon{width:34px;height:34px;justify-content:center;padding:0;font-size:16px;border-radius:50%}
 .logo{display:flex;align-items:center;gap:10px;font-size:26px;letter-spacing:.04em;text-transform:uppercase}
 .logo span:not(.stripe){color:var(--muted);font-weight:500}
@@ -127,7 +131,7 @@ tr.sel-b td:first-child{box-shadow:inset 3px 0 0 var(--ref)}
 .map-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
 .seg button{border:0;border-radius:0;padding:4px 10px;font-size:12.5px;background:var(--panel)}
-.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.seg button[aria-pressed="true"]{background:var(--sel);color:var(--sel-fg)}
 .map-box{position:relative;width:100%;aspect-ratio:4/3;max-width:100%}
 .map-box canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted);margin-top:8px}
@@ -171,10 +175,10 @@ details summary{cursor:pointer;font-family:var(--f-display);text-transform:upper
 /* simple / advanced charts, inputs card */
 .ctabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin-bottom:6px}
 .ctabs button{justify-content:center;font-family:var(--f-display);text-transform:uppercase;letter-spacing:.05em;font-size:13px;padding:6px 4px}
-.ctabs button[aria-selected="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.ctabs button[aria-selected="true"]{background:var(--sel);color:var(--sel-fg);border-color:var(--sel)}
 .charts.simple .chart .fold{display:none}
 #inputs{display:block;width:100%;height:150px}
-.zbtns button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.zbtns button[aria-pressed="true"]{background:var(--sel);color:var(--sel-fg)}
 /* lap bar (top) */
 .lapbar{position:sticky;top:0;z-index:20;display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(6px)}
 .lapbar .lp{display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 280px;border-radius:8px;padding:4px 4px 4px 10px;color:#fff}
@@ -192,8 +196,8 @@ details summary{cursor:pointer;font-family:var(--f-display);text-transform:upper
 .lapbar .lp{min-width:0}
 @media (max-width:700px){.lapbar .lp{flex-wrap:wrap;flex-basis:100%;padding:6px 8px}.lapbar .who{max-width:calc(100% - 30px);flex:1 1 0}.lapbar .lp select{flex:1 1 0;min-width:0}.abmid{flex-direction:row;width:100%;justify-content:center;order:0}}
 /* jump bar */
-.jump{display:flex;gap:2px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px}
-.jump button{font-family:var(--f-display);text-transform:uppercase;letter-spacing:.07em;font-size:14.5px;font-weight:600;padding:5px 16px;border-radius:999px;background:transparent;border-color:transparent;color:var(--muted)}
+.jump{display:flex;gap:2px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:3px}
+.jump button{font-family:var(--f-display);text-transform:uppercase;letter-spacing:.07em;font-size:14.5px;font-weight:600;padding:5px 16px;border-radius:5px;background:transparent;border-color:transparent;color:var(--muted)}
 .jump button:hover:not([aria-current]){color:var(--fg);background:var(--panel-2)}
 /* overview */
 .ov{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:20px}
@@ -232,7 +236,7 @@ body.sidecam .rp-ctrl input[type=range]{flex-basis:120px}
 .dash.panel{padding:10px 12px 8px}
 body:not([data-page="help"]) [data-pg="help"],body:not([data-page="analyse"]) [data-pg="analyse"],body:not([data-page="track"]) [data-pg="track"],body:not([data-page="laps"]):not(.nolaps) [data-pg="laps"],body.nolaps:not([data-page="laps"]) [data-pg="laps"]:not(#drop){display:none}
 #checkPanel[hidden]{display:none!important}
-.jump button[aria-current="page"]{background:var(--fg);color:var(--bg);border-color:var(--fg);box-shadow:inset 0 -2px 0 var(--you)}
+.jump button[aria-current="page"]{background:var(--sel);color:var(--sel-fg);border-color:var(--sel)}
 .charts{display:flex;flex-direction:column}
 .charts:not(.simple){flex-direction:row;flex-wrap:wrap;column-gap:6px}
 .charts:not(.simple) .chart{flex:1 0 100%}
@@ -251,7 +255,7 @@ body:not([data-page="help"]) [data-pg="help"],body:not([data-page="analyse"]) [d
 #segTitle p{margin:2px 0 8px;color:var(--muted);font-size:12.5px}
 .tabs{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-bottom:8px}
 .tabs button{border:0;border-radius:0;justify-content:center;font-family:var(--f-display);text-transform:uppercase;letter-spacing:.06em;font-size:13.5px;background:var(--panel)}
-.tabs button[aria-selected="true"]{background:var(--fg);color:var(--bg)}
+.tabs button[aria-selected="true"]{background:var(--sel);color:var(--sel-fg)}
 .tabbody{max-height:230px;overflow:auto}
 .segtbl td{padding:4px 6px}
 .segtbl td:nth-child(n+2){text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -297,6 +301,7 @@ body.sidecam #rpView .ic,body.sidecam #rpSync .ic{display:none}
 #consTbl tr.hot td:first-child{box-shadow:inset 3px 0 0 var(--loss)}
 #consTbl tbody tr{cursor:pointer}
 #consInfo b{color:var(--fg)}
+#rpPlay{width:44px;height:36px;padding:0;display:inline-flex;align-items:center;justify-content:center;flex:none}#rpPlay .ic{width:18px;height:18px;margin:0!important}
 .tyre-cmp{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:12px;margin-top:6px}
 .tcar{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--panel)}
 .tcar h3{margin:0 0 8px;font-family:var(--f-display);font-size:16px;display:flex;gap:8px;align-items:baseline}
@@ -366,7 +371,7 @@ body.sidecam .rp-ctrl{flex-wrap:nowrap;gap:8px}body.sidecam .rp-ctrl #rpTime{fon
       <div class="rp-hud"><div class="rp-card" id="hudA"></div><div class="rp-gap" id="hudGap"></div><div class="rp-card" id="hudB"></div></div>
     </div>
         <div class="rp-ctrl">
-      <button id="rpPlay" class="primary" style="background:var(--fg);color:var(--bg);border-color:var(--fg);min-width:92px"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg>Play</button>
+      <button id="rpPlay" class="primary" title="Play" aria-label="Play" style="background:var(--fg);color:var(--bg);border-color:var(--fg)"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg></button>
       <input type="range" id="rpSlider" min="0" max="1000" value="0" aria-label="Position in the lap">
       <select id="rpSpeed" aria-label="Replay speed"><option value="0.25">¼×</option><option value="0.5">½×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option></select>
       <select id="rpGhost" aria-label="Ghost car" title="Which lap drives along as the see-through ghost car"><option value="b" selected>Ghost: B</option><option value="best">Ghost: fastest</option><option value="off">No ghost</option></select>
@@ -490,7 +495,7 @@ body.sidecam .rp-ctrl{flex-wrap:nowrap;gap:8px}body.sidecam .rp-ctrl #rpTime{fon
     </div>
     <div>
       <h3><svg class="ic" aria-hidden="true"><use href="#i-mountain"/></svg>Real track heights</h3>
-      <p>Hills in the camera and the Height chart come from, in this order: a height channel in the recording (LMU doesn't write one today), a TinyPedal track map, or an estimate from how the car accelerates.</p>
+      <p>Hills in the camera come from, in this order: a height channel in the recording (LMU doesn't write one today), a TinyPedal track map, or an estimate from how the car accelerates.</p>
       <p>Built in: Le Mans, Spa, Monza (and Curva Grande), Imola, Interlagos, COTA, Fuji, Lusail, Portimão (Algarve) and the Sebring School circuit. For another track, put its TinyPedal track map <span class="mono">.svg</span> in the <span class="mono">trackmaps</span> folder next to this page (and add the file name to <span class="mono">trackmaps/index.json</span>), or drop the .svg on the page for this visit only. Maps in the folder win over the built-in ones.</p>
       <p class="muted" id="mapFolderNote"></p>
     </div>
@@ -1460,7 +1465,6 @@ const CHARTS = [
   { key: "brk", label: "Brake", h: 56, unit: "%", pct: true, min: 0, max: 1 },
   { key: "steer", label: "Steering", h: 80, unit: "%", pct: true, sym: true, hint: "+ right" },
   { key: "gear", label: "Gear", h: 60, unit: "", digits: 0, step: true },
-  { key: "z", label: "Height", h: 70, unit: "m", digits: 0, hint: "estimated from how the car accelerates", hintReal: "measured, from the file" },
   { key: "pl", label: "Line", h: 80, unit: "m", sym: true, digits: 1, hint: "metres from the track's centre, + right" },
   { key: "slip", label: "Wheel slip", h: 90, unit: "%", hint: "lap A · front lowest, rear highest" },
 ];
@@ -1471,7 +1475,7 @@ function buildCharts() {
     d.innerHTML = `<div class="lab" role="button" tabindex="0" aria-expanded="true"><b>${c.label}</b><span class="va who-a"></span><span class="vb who-b"></span><span class="hint">${c.hint || ""}</span><span class="fold">▾</span></div><canvas height="${c.h}" style="height:${c.h}px"></canvas>`;
     const lab = d.querySelector(".lab"), setFold = f => { c.folded = f; d.classList.toggle("folded", f); lab.setAttribute("aria-expanded", String(!f)); lab.querySelector(".fold").textContent = f ? "▸" : "▾"; };
     let saved = prefGet("folded", null);
-    setFold((saved || ["steer", "gear", "z", "pl", "slip"]).includes(c.key));
+    setFold((saved || ["steer", "gear", "pl", "slip"]).includes(c.key));
     const toggle = () => { setFold(!c.folded); prefSet("folded", CHARTS.filter(x => x.folded).map(x => x.key)); drawAll(); };
     lab.onclick = toggle; lab.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } };
     box.appendChild(d); c.el = d; c.cv = d.querySelector("canvas"); c.hintEl = d.querySelector(".hint");
@@ -1479,7 +1483,7 @@ function buildCharts() {
   }
 }
 function viewRange() { const A = state.A; const L = A ? A.L : 1; return state.range || [0, L]; }
-function zoomTo(a, b) { const A = state.A; if (!A) return; state.range = [Math.max(0, a), Math.min(A.L, b)]; drawAll(); }
+function zoomTo(a, b) { const A = state.A; if (!A) return; state.range = [Math.max(0, a), Math.min(A.L, b)]; state.zFit = false; drawAll(); }
 function attachChartEvents(c) {
   let dragStart = null, dragNow = null;
   const toD = ev => { const r = c.cv.getBoundingClientRect(); const [a, b] = viewRange(); return a + (b - a) * clamp((ev.clientX - r.left - PADL) / (r.width - PADL - PADR), 0, 1); };
@@ -1536,7 +1540,6 @@ function drawAll(skipReplay) {
   const A = state.A, B = state.B;
   if (!skipReplay) placeCam();
   drawMap(); drawZoomMap(); drawMini(); drawInputs(); if (!skipReplay) { drawReplay(); drawCons(); }
-  for (const c of CHARTS) if (c.hintReal && c.hintEl) { const t = A && A.zReal ? (A.zSrc === "map" ? "measured, from the track map (" + (A.zMapName || "") + ")" : c.hintReal) : c.hint; if (c.hintEl.textContent !== t) c.hintEl.textContent = t; }
   const hn = $("#hillNote"); if (hn) { const t = A && A.zReal ? (A.zSrc === "map" ? "Hills are measured (track map)." : "Hills are measured.") : "Hills are estimated. Drop a TinyPedal track map .svg to use real heights."; if (hn.textContent !== t) hn.textContent = t; }
   if (!A) { for (const c of CHARTS) { const [ctx, w, h] = fitCanvas(c.cv); ctx.clearRect(0, 0, w, h); } return; }
   if (!state._delta || state._dA !== A || state._dB !== B) { state._delta = deltaSeries(A, B); state._dA = A; state._dB = B; }
@@ -1547,7 +1550,7 @@ function drawAll(skipReplay) {
     const hk = chartScale();
     if (state.layout === "simple") { const on = c.key === state.ctab; c.el.hidden = !on; c.el.classList.toggle("folded", !on); c.cv.style.height = Math.round(240 * hk) + "px"; if (!on) continue; }
     else { c.el.classList.toggle("folded", !!c.folded); c.cv.style.height = Math.round(c.h * hk) + "px"; c.el.hidden = false;
-    if (c.key === "pl" || c.key === "z") { const has = A[c.key] && A[c.key].some(Number.isFinite); c.el.hidden = !has; if (!has) continue; }
+    if (c.key === "pl") { const has = A[c.key] && A[c.key].some(Number.isFinite); c.el.hidden = !has; if (!has) continue; }
     if (c.folded) continue; }
     const [ctx, w, h] = fitCanvas(c.cv); if (!c.cv.width || !c.cv.height) continue;
     const X = D => PADL + (D - d0) / (d1 - d0) * (w - PADL - PADR);
@@ -2021,7 +2024,7 @@ function defaultSeg() {
 }
 function selectSeg(i, keepCursor) {
   const n = state.corners.length; if (!n || !state.A) { state.seg = null; renderSeg(); return; }
-  state.seg = ((i % n) + n) % n; const c = state.corners[state.seg], A = state.A;
+  state.seg = ((i % n) + n) % n; const c = state.corners[state.seg], A = state.A; state.zFit = false;
   state.range = [Math.max(0, c.s * A.step - 120), Math.min(A.L, c.e * A.step + 120)];
   if (!keepCursor && !state.rp.on) state.cursor = c.apex * A.step;
   renderSeg(); drawAll();
@@ -2070,28 +2073,34 @@ function drawZoomMap() {
   ctx.fillStyle = "#14171c"; ctx.fillRect(0, 0, w, h);
   if (!A || !A.x.some(Number.isFinite)) return;
   let D = state.cursor; if (D == null) { const c = state.seg != null ? state.corners[state.seg] : null; D = c ? c.apex * A.step : 0; }
-  const c0 = sposAt(A, D); if (!c0) return;
-  let rc = 1, rs = 0; if (state.zrot) { const hd = sheadingAt(A, D); if (hd) { const ang = Math.PI / 2 - Math.atan2(hd[1], hd[0]); state._zang = state._zang == null ? ang : state._zang + Math.atan2(Math.sin(ang - state._zang), Math.cos(ang - state._zang)) * 0.35; rc = Math.cos(state._zang); rs = Math.sin(state._zang); } } else state._zang = null;
-  const s = w / state.mz, P = (x, y) => { const dx = x - c0[0], dy = y - c0[1]; return [w / 2 + (dx * rc - dy * rs) * s, h / 2 - (dx * rs + dy * rc) * s]; };
+  let c0 = sposAt(A, D); if (!c0) return;
+  // whole-track view (after loading laps, or "Show whole lap") until a corner is picked, the charts are zoomed or the map is zoomed in; hovering a chart still follows the cursor
+  let mz = state.mz; const fit = state.zFit && state.cursor == null;
+  if (fit) { const S0 = smoothXY(A), E0 = trackEdges(A); let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for (const [xs, ys] of [[S0.x, S0.y], [E0.lx, E0.ly], [E0.rx, E0.ry]]) for (let k = 0; k < A.n; k++) { const x = xs[k], y = ys[k]; if (!Number.isFinite(x) || !Number.isFinite(y)) continue; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    if (x1 > x0) { c0 = [(x0 + x1) / 2, (y0 + y1) / 2]; mz = Math.max(x1 - x0, (y1 - y0) * w / h) * 1.12 + 20; } }
+  let rc = 1, rs = 0; if (state.zrot && !fit) { const hd = sheadingAt(A, D); if (hd) { const ang = Math.PI / 2 - Math.atan2(hd[1], hd[0]); state._zang = state._zang == null ? ang : state._zang + Math.atan2(Math.sin(ang - state._zang), Math.cos(ang - state._zang)) * 0.35; rc = Math.cos(state._zang); rs = Math.sin(state._zang); } } else state._zang = null;
+  const s = w / mz, P = (x, y) => { const dx = x - c0[0], dy = y - c0[1]; return [w / 2 + (dx * rc - dy * rs) * s, h / 2 - (dx * rs + dy * rc) * s]; };
   // grid in track metres (moves and turns with the map): fine every 10 m, strong every 50 m
-  { const Rg = state.mz * 0.8, g = state.mz > 400 ? 25 : 10;
+  const gStep = mz > 2000 ? 100 : mz > 400 ? 25 : 10;
+  { const Rg = mz * 0.8, g = gStep;
     for (const major of [false, true]) { const st = major ? g * 5 : g; ctx.strokeStyle = major ? "rgba(255,255,255,.16)" : "rgba(255,255,255,.06)"; ctx.lineWidth = 1; ctx.beginPath();
       for (let gx = Math.floor((c0[0] - Rg) / st) * st; gx <= c0[0] + Rg; gx += st) { const a = P(gx, c0[1] - Rg), b = P(gx, c0[1] + Rg); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); }
       for (let gy = Math.floor((c0[1] - Rg) / st) * st; gy <= c0[1] + Rg; gy += st) { const a = P(c0[0] - Rg, gy), b = P(c0[0] + Rg, gy); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); }
       ctx.stroke(); } }
-  const E = trackEdges(A), span = state.mz * 1.2, k0 = Math.max(0, Math.floor((D - span) / A.step)), k1 = Math.min(A.n - 1, Math.ceil((D + span) / A.step));
+  const E = trackEdges(A), span = fit ? Infinity : mz * 1.2, k0 = fit ? 0 : Math.max(0, Math.floor((D - span) / A.step)), k1 = fit ? A.n - 1 : Math.min(A.n - 1, Math.ceil((D + span) / A.step));
   ctx.fillStyle = col.asph; ctx.beginPath(); let pen = false;
   for (let k = k0; k <= k1; k++) { if (!Number.isFinite(E.lx[k])) continue; const [px, py] = P(E.lx[k], E.ly[k]); pen ? ctx.lineTo(px, py) : ctx.moveTo(px, py); pen = true; }
   for (let k = k1; k >= k0; k--) { if (!Number.isFinite(E.rx[k])) continue; const [px, py] = P(E.rx[k], E.ry[k]); ctx.lineTo(px, py); }
   ctx.closePath(); ctx.fill();
   ctx.strokeStyle = col.kerb; ctx.lineWidth = 1.5;
   for (const [xs, ys] of [[E.lx, E.ly], [E.rx, E.ry]]) { ctx.beginPath(); pen = false; for (let k = k0; k <= k1; k++) { if (!Number.isFinite(xs[k])) { pen = false; continue; } const [px, py] = P(xs[k], ys[k]); pen ? ctx.lineTo(px, py) : ctx.moveTo(px, py); pen = true; } ctx.stroke(); }
-  const line = (L, color, D0) => { const S2 = smoothXY(L), j0 = Math.max(0, Math.floor((D0 - span) / L.step)), j1 = Math.min(L.n - 1, Math.ceil((D0 + span) / L.step)); ctx.strokeStyle = color; ctx.lineWidth = Math.max(2, 0.6 * s); ctx.lineJoin = "round"; ctx.lineCap = "round"; ctx.beginPath(); let pn = false; for (let k = j0; k <= j1; k++) { if (!Number.isFinite(S2.x[k])) { pn = false; continue; } const [px, py] = P(S2.x[k], S2.y[k]); pn ? ctx.lineTo(px, py) : ctx.moveTo(px, py); pn = true; } ctx.stroke(); };
+  const line = (L, color, D0) => { const S2 = smoothXY(L), j0 = fit ? 0 : Math.max(0, Math.floor((D0 - span) / L.step)), j1 = fit ? L.n - 1 : Math.min(L.n - 1, Math.ceil((D0 + span) / L.step)); ctx.strokeStyle = color; ctx.lineWidth = Math.max(2, 0.6 * s); ctx.lineJoin = "round"; ctx.lineCap = "round"; ctx.beginPath(); let pn = false; for (let k = j0; k <= j1; k++) { if (!Number.isFinite(S2.x[k])) { pn = false; continue; } const [px, py] = P(S2.x[k], S2.y[k]); pn ? ctx.lineTo(px, py) : ctx.moveTo(px, py); pn = true; } ctx.stroke(); };
   const bOk = B && B.posFrame === A.posFrame && B.x.some(Number.isFinite), DB = bOk ? D * scaleTo(A, B) : NaN;
   if (bOk) line(B, col.b, DB); line(A, col.a, D);
   const dot = (p, color) => { if (!p) return; const [px, py] = P(p[0], p[1]); ctx.fillStyle = color; ctx.strokeStyle = col.panel; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(px, py, 8, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); };
-  if (bOk) dot(sposAt(B, DB), col.b); dot(c0, col.a);
-  ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.font = "11px " + css("--f-mono"); ctx.textAlign = "right"; ctx.fillText(`${Math.round(state.mz)} m across · grid ${state.mz > 400 ? 25 : 10} m`, w - 8, h - 8);
+  if (!fit) { if (bOk) dot(sposAt(B, DB), col.b); dot(c0, col.a); }
+  ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.font = "11px " + css("--f-mono"); ctx.textAlign = "right"; ctx.fillText(fit ? `whole lap · ${(mz / 1000).toFixed(1)} km across · grid ${gStep} m` : `${Math.round(mz)} m across · grid ${gStep} m`, w - 8, h - 8);
 }
 function miniLayout() {
   const cv = $("#minimap"), A = state.A; if (!cv || !A) return null; const w = cv.clientWidth, h = cv.clientHeight;
@@ -2138,9 +2147,9 @@ function drawMini() {
 function attachDash() {
   $("#segPrev").onclick = () => selectSeg((state.seg ?? 0) - 1);
   $("#segNext").onclick = () => selectSeg((state.seg ?? -1) + 1);
-  $("#zIn").onclick = () => { state.mz = Math.max(60, state.mz / 1.5); drawZoomMap(); };
+  $("#zIn").onclick = () => { if (state.zFit && state.cursor == null) state.zFit = false; else state.mz = Math.max(60, state.mz / 1.5); drawZoomMap(); };
   $("#zOut").onclick = () => { state.mz = Math.min(3000, state.mz * 1.5); drawZoomMap(); };
-  $("#zmap").addEventListener("wheel", e => { e.preventDefault(); state.mz = clamp(state.mz * (e.deltaY > 0 ? 1.2 : 1 / 1.2), 60, 3000); drawZoomMap(); }, { passive: false });
+  $("#zmap").addEventListener("wheel", e => { e.preventDefault(); if (state.zFit && state.cursor == null) { if (e.deltaY < 0) { state.zFit = false; drawZoomMap(); } return; } state.mz = clamp(state.mz * (e.deltaY > 0 ? 1.2 : 1 / 1.2), 60, 3000); drawZoomMap(); }, { passive: false });
   $("#minimap").addEventListener("click", e => { const L = miniLayout(); if (!L) return; const r = e.target.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top; let best = null, bd = 900; for (const m of L.marks) if (m) { const d = (m.px - mx) ** 2 + (m.py - my) ** 2; if (d < bd) { bd = d; best = m.i; } } if (best != null) selectSeg(best); });
   document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => { document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", String(x === b))); $("#tabSeg").hidden = b.dataset.tab !== "seg"; $("#tabTips").hidden = b.dataset.tab !== "tips"; });
 }
@@ -2149,10 +2158,15 @@ function attachDash() {
 state.rp = { on: false, t: 0, speed: 1, view: "chase", sync: "time", ghost: "b" };
 // The ghost car: lap B, or the fastest clean lap on this track (anyone's but lap A); lap B falls back to the fastest when no B is picked
 function ghostLap() {
-  const A = state.A, m = state.rp.ghost; if (!A || m === "off") return null;
+  const A = state.A, m = $("#rpGhost")?.hidden ? "b" : state.rp.ghost; if (!A || m === "off") return null;
   if (m === "b" && state.B) return state.B;
-  return allLaps().filter(l => l !== A && sameTrack(l, A) && isClean(l) && Number.isFinite(lapEnd(l)) && l.x).sort((x, y) => lapEnd(x) - lapEnd(y))[0] || null;
+  return fastestOther(A);
 }
+// the see-through ghost car only drives when there are two or more reference laps to choose from; with one, its line and the gap stay
+function showGhost() { const sel = $("#rpGhost"); return !!sel && !sel.hidden; }
+function fastestOther(A) { return allLaps().filter(l => l !== A && sameTrack(l, A) && isClean(l) && Number.isFinite(lapEnd(l)) && l.x).sort((x, y) => lapEnd(x) - lapEnd(y))[0] || null; }
+// the ghost picker only shows when there is a real choice (lap B and a different fastest lap)
+function updateGhostPicker() { const sel = $("#rpGhost"); if (!sel) return; const A = state.A, refs = new Set(A ? [state.B, fastestOther(A)].filter(Boolean) : []); sel.hidden = refs.size <= 1; }
 function ghostName(G) { return G === state.B ? "B" : "Ghost"; }
 function ghostDelta(G) { const A = state.A; if (!A || !G) return null; if (G === state.B && state._delta && state._dA === A && state._dB === G) return state._delta; if (state._gD && state._gA === A && state._gG === G) return state._gD; state._gA = A; state._gG = G; return state._gD = deltaSeries(A, G); }
 function lapIndex(L) { if (L._ti) return L._ti; const ks = [], ts = []; for (let k = 0; k < L.n; k++) { const t = L.t[k]; if (Number.isFinite(t) && (!ts.length || t > ts[ts.length - 1])) { ks.push(k); ts.push(t); } } return L._ti = { ks, ts }; }
@@ -2305,7 +2319,7 @@ function drawChase(ctx, w, h, st, E, pA, hCar, pB, hB, col, hCam) {
   // your car solid, B as a see-through ghost so it never hides behind yours
   const slopeAt = D => (zAt(D + 2.3) - zAt(D - 2.3)) / 4.6;
   drawCarBox(ctx, P, pA, hCar, col.a, col, zCar, slopeAt(DA));
-  if (pB && hB) { const dB = DB / scaleTo(A, B); ctx.globalAlpha = 0.55; drawCarBox(ctx, P, pB, hB, col.b, col, zAt(dB), slopeAt(dB)); ctx.globalAlpha = 1;
+  if (pB && hB && showGhost()) { const dB = DB / scaleTo(A, B); ctx.globalAlpha = 0.55; drawCarBox(ctx, P, pB, hB, col.b, col, zAt(dB), slopeAt(dB)); ctx.globalAlpha = 1;
     // name tag with the live gap above the ghost
     const tag = P(pB[0], pB[1], zAt(dB) + 2.4);
     if (tag && tag[2] > 3 && tag[2] < 400) { const gd = ghostDelta(B), g = gd ? arrAt(gd, A.step, DA) : NaN; const txt = `${ghostName(B)}${Number.isFinite(g) ? "  " + fmtDelta(g) + " s" : ""}`;
@@ -2359,7 +2373,7 @@ function drawTop(ctx, w, h, st, E, pA, hA, pB, hB, col) {
   const line = (L, color, wd) => { ctx.strokeStyle = color; ctx.lineWidth = wd; ctx.lineJoin = "round"; ctx.beginPath(); let pn = false; for (let k = 0; k < L.n; k++) { if (!Number.isFinite(L.x[k])) { pn = false; continue; } const [px, py] = P(L.x[k], L.y[k]); if (!pn) { ctx.moveTo(px, py); pn = true; } else ctx.lineTo(px, py); } ctx.stroke(); };
   if (pB) line(B, col.b, R.view === "lap" ? 1.5 : 2.5); line(A, col.a, R.view === "lap" ? 1.5 : 2.5);
   const car = (p, hd, color) => { const [px, py] = P(p[0], p[1]); const ang = Math.atan2(-hd[1], hd[0]); const L2 = Math.max(9, 2.35 * s), W2 = Math.max(4.5, 1.0 * s); ctx.save(); ctx.translate(px, py); ctx.rotate(ang); ctx.fillStyle = color; ctx.strokeStyle = col.panel; ctx.lineWidth = 2; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(-L2, -W2, 2 * L2, 2 * W2, W2 * 0.6) : ctx.rect(-L2, -W2, 2 * L2, 2 * W2); ctx.fill(); ctx.stroke(); ctx.restore(); };
-  if (pB && hB) car(pB, hB, col.b); car(pA, hA, col.a);
+  if (pB && hB && showGhost()) car(pB, hB, col.b); car(pA, hA, col.a);
 }
 function updateHud(st) {
   const hA = $("#hudA"), hB = $("#hudB"), hG = $("#hudGap");
@@ -2388,8 +2402,8 @@ function rpTick(ts) {
   drawReplay(); drawAll(true);
   if (R.on) requestAnimationFrame(rpTick);
 }
-function rpStart() { const R = state.rp; const st = rpCars(); if (!st) return; if (R.t >= st.T - 0.05) R.t = 0; R.on = true; rpLast = 0; $("#rpPlay").innerHTML = '<svg class="ic" aria-hidden="true"><use href="#i-pause"/></svg>Pause'; requestAnimationFrame(rpTick); }
-function rpStop() { state.rp.on = false; $("#rpPlay").innerHTML = '<svg class="ic" aria-hidden="true"><use href="#i-play"/></svg>Play'; }
+function rpStart() { const R = state.rp; const st = rpCars(); if (!st) return; if (R.t >= st.T - 0.05) R.t = 0; R.on = true; rpLast = 0; $("#rpPlay").innerHTML = '<svg class="ic" aria-hidden="true"><use href="#i-pause"/></svg>'; $("#rpPlay").title = $("#rpPlay").ariaLabel = "Pause"; requestAnimationFrame(rpTick); }
+function rpStop() { state.rp.on = false; $("#rpPlay").innerHTML = '<svg class="ic" aria-hidden="true"><use href="#i-play"/></svg>'; $("#rpPlay").title = $("#rpPlay").ariaLabel = "Play"; }
 function attachReplay() {
   $("#rpPlay").onclick = () => state.rp.on ? rpStop() : rpStart();
   { const g = prefGet("ghost", "b"), sp = +prefGet("speed", 1); if (["b", "best", "off"].includes(g)) { state.rp.ghost = g; $("#rpGhost").value = g; } if ([0.25, 0.5, 1, 2, 4, 8].includes(sp)) { state.rp.speed = sp; $("#rpSpeed").value = String(sp); } }
@@ -2493,9 +2507,9 @@ function checkPair() {
   if (B2 && (A !== state._okA || B2 !== state._okB) && ((A.car && B2.car && A.car !== B2.car) || (A.carClass && B2.carClass && A.carClass !== B2.carClass))) toast(`Different cars: A is ${A.car || A.carClass}, B is ${B2.car || B2.carClass}. The comparison still works, but the cars won't brake or accelerate the same.`, "info");
   state._okA = A; state._okB = state.B;
 }
-function renderAll() { state._chartV = (state._chartV || 0) + 1; checkPair(); applyProfiles(); document.body.classList.toggle("nolaps", !state.sessions.length); if (state._rpA !== state.A || state._rpB !== state.B) { state._rpA = state.A; state._rpB = state.B; rpStop(); state.rp.t = 0; } renderLaps(); renderSummary(); renderCoach(); renderCornerTable(); state._cons = null; renderConsistency(); renderTyres(); renderGroup(); state._delta = null; state._delta = state.A ? deltaSeries(state.A, state.B) : null; state._dA = state.A; state._dB = state.B; renderOverview(); if (state._segA !== state.A || state._segB !== state.B || state.seg == null || state.seg >= state.corners.length) { state._segA = state.A; state._segB = state.B; state.seg = defaultSeg(); if (state.seg != null && state.A && state.corners[state.seg]) { const c = state.corners[state.seg]; state.range = [Math.max(0, c.s * state.A.step - 120), Math.min(state.A.L, c.e * state.A.step + 120)]; } else if (!state.A) state.range = null; } renderSeg(); drawAll(); }
+function renderAll() { state._chartV = (state._chartV || 0) + 1; checkPair(); applyProfiles(); document.body.classList.toggle("nolaps", !state.sessions.length); if (state._rpA !== state.A || state._rpB !== state.B) { state._rpA = state.A; state._rpB = state.B; rpStop(); state.rp.t = 0; } renderLaps(); renderSummary(); renderCoach(); renderCornerTable(); state._cons = null; renderConsistency(); renderTyres(); updateGhostPicker(); renderGroup(); state._delta = null; state._delta = state.A ? deltaSeries(state.A, state.B) : null; state._dA = state.A; state._dB = state.B; renderOverview(); if (state._segA !== state.A || state._segB !== state.B || state.seg == null || state.seg >= state.corners.length) { state._segA = state.A; state._segB = state.B; state.seg = defaultSeg(); state.range = null; state.zFit = true; if (!state.rp.on) state.cursor = null; } renderSeg(); drawAll(); }
 buildCharts(); attachMapEvents(); attachStrips(); attachReplay(); attachDash(); attachLapBar();
-$("#resetZoom").onclick = () => { state.range = null; drawAll(); };
+$("#resetZoom").onclick = () => { state.range = null; state.zFit = true; if (!state.rp.on) state.cursor = null; drawAll(); };
 $("#saveLap").onclick = saveLap;
 $("#copyReport").onclick = copyReport; $("#sameTrack").onchange = renderGroup;
 $("#fileIn").addEventListener("change", e => { handleFiles(e.target.files); e.target.value = ""; });
