@@ -2162,8 +2162,8 @@ function ghostLap() {
   if (m === "b" && state.B) return state.B;
   return fastestOther(A);
 }
-// the see-through ghost car only drives when there are two or more reference laps to choose from; with one, its line and the gap stay
-function showGhost() { const sel = $("#rpGhost"); return !!sel && !sel.hidden; }
+// the see-through ghost car drives whenever lap B is loaded (or a ghost is picked from the menu); with no lap B and nothing to pick, only its line and the gap show
+function showGhost() { if (!ghostLap()) return false; const sel = $("#rpGhost"); return !!state.B || (!!sel && !sel.hidden); }
 function fastestOther(A) { return allLaps().filter(l => l !== A && sameTrack(l, A) && isClean(l) && Number.isFinite(lapEnd(l)) && l.x).sort((x, y) => lapEnd(x) - lapEnd(y))[0] || null; }
 // the ghost picker only shows when there is a real choice (lap B and a different fastest lap)
 function updateGhostPicker() { const sel = $("#rpGhost"); if (!sel) return; const A = state.A, refs = new Set(A ? [state.B, fastestOther(A)].filter(Boolean) : []); sel.hidden = refs.size <= 1; }
