@@ -1,4 +1,4 @@
-LMU Telemetry=================================
+LMU Telemetry
 
 Adding a track map
   1. In TinyPedal, drive a lap on the track so it saves the map. TinyPedal
