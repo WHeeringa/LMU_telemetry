@@ -1,0 +1,7 @@
+# Apache: make sure the browser gets the right file types
+AddType text/javascript .mjs
+AddType application/wasm .wasm
+# The engine file is already gzip-packed; the page unpacks it itself, so don't mark it as encoded
+<IfModule mod_mime.c>
+  RemoveEncoding .gz
+</IfModule>
